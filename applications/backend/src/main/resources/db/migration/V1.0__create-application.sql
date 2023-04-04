@@ -12,10 +12,12 @@ create table if not exists application (
     wbs_present boolean default false,
     earliest_move_in_date timestamptz,
     pets boolean default false,
-    status int,
+    -- enum
+    status int not null,
     applicant_comment varchar(1000),
     user_comment varchar(1000),
     creation_timestamp timestamptz,
-    creation_source int,
-    property_id bigint
+    -- enum
+    creation_source int not null,
+    property_id bigint not null
 );
