@@ -2,9 +2,7 @@ package searchrequests.model;
 
 import lombok.Data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.time.ZonedDateTime;
 
 // Named "PropertyApplication" instead of "Application" to reduce confusion
@@ -14,6 +12,7 @@ public class PropertyApplication {
 
     @Id
     @Column
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column
@@ -37,6 +36,7 @@ public class PropertyApplication {
     @Column
     private boolean wbsPresent;
 
+    // TODO: zonedDateTime/timezone in general might not make much sense here --> LocalDate!
     @Column
     private ZonedDateTime earliestMoveInDate;
 
@@ -52,6 +52,7 @@ public class PropertyApplication {
     @Column
     private String userComment;
 
+    // TODO: This is a technical timestamp --> Instant!
     @Column
     private ZonedDateTime creationTimestamp;
 
