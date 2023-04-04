@@ -1,0 +1,13 @@
+# Datasource
+spring:
+  datasource:
+    name: applications_test
+    driverClassName: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/applications_db
+    username: test
+    password: test
+  jpa:
+   database-platform: org.hibernate.dialect.PostgreSQL95Dialect
+# Uncomment when executing against new DB where schema already exists
+#  flyway:
+#    baseline-on-migrate: true
