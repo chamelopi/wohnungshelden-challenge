@@ -4,7 +4,7 @@ create table if not exists application (
     email varchar(50) not null,
     -- storing enums by their ordinal value for efficiency. drawback: cannot reorder the enum values in Java
     -- without breaking existing rows.
-    saluation int,
+    salutation int,
     first_name varchar(50) not null,
     last_name varchar(50) not null,
     number_of_persons int,
