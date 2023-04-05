@@ -2,6 +2,8 @@ package searchrequests.controller;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -14,8 +16,7 @@ import searchrequests.persistence.PropertyApplicationRepository;
 import java.nio.file.Files;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -67,5 +68,19 @@ class PropertyApplicationControllerTest {
                 .andExpect(jsonPath("$.earliestMoveInDate").value("2023-06-01"));
 
         Mockito.verify(repo, times(1)).save(any());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"uiapplication_invalid_email.json", "uiapplication_missing_first_name.json", "portalapplication_missing_property_id.json"})
+    @DisplayName("test if validation failure causes error responses and no persistence")
+    void testValidation(String testdataFile) throws Exception {
+        var testdata = Files.readAllBytes(ResourceUtils.getFile("classpath:testdata/" + testdataFile).toPath());
+
+        mvc.perform(post("/api/v1/ui/applications/")
+                        .content(testdata)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
+
+        Mockito.verify(repo, never()).save(any());
     }
 }
