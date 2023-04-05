@@ -11,12 +11,17 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
+import searchrequests.model.PropertyApplication;
+import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
 import java.nio.file.Files;
+import java.time.Instant;
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -82,5 +87,33 @@ class PropertyApplicationControllerTest {
                 .andExpect(status().isBadRequest());
 
         Mockito.verify(repo, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("test if retrieval by id works")
+    void testGetById() throws Exception {
+        var testApplication = new PropertyApplication();
+        testApplication.setId(12);
+        testApplication.setStatus(Status.CREATED);
+        testApplication.setCreationTimestamp(Instant.now());
+        testApplication.setFirstName("blub");
+        testApplication.setEmail("blub@blah.de");
+        testApplication.setPropertyId(1337);
+
+        doReturn(Optional.of(testApplication)).when(repo).findById(12L);
+
+        mvc.perform(get("/api/v1/applications/12"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.email").value("blub@blah.de"));
+    }
+
+    @Test
+    @DisplayName("test if get by id returns 404 if no application with that id exists")
+    void testGetByIdNotFound() throws Exception {
+        doReturn(Optional.empty()).when(repo).findById(12L);
+
+        mvc.perform(get("/api/v1/applications/12"))
+                .andExpect(status().isNotFound());
     }
 }

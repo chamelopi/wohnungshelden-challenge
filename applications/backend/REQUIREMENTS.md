@@ -48,7 +48,7 @@
     to a different page. That means the property needs to be
     considered in the filter.
   - You can decide how the API will look like which the UI calls.
-- [ ] Enable backend to retrieve the detailed representation of a single application by id.
+- [x] Enable backend to retrieve the detailed representation of a single application by id.
   - The result contains all the fields of the application for displaying in the details
     view.
   - You can decide how the API will look like which the UI calls.

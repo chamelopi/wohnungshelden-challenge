@@ -6,10 +6,7 @@ import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import searchrequests.dto.PortalApplicationDto;
 import searchrequests.dto.UiApplicationDto;
@@ -43,6 +40,14 @@ public class PropertyApplicationController {
     public ResponseEntity<PropertyApplication> createApplicationFromPortal(@RequestBody @Valid PortalApplicationDto portalApplication) {
         var propertyApplication = Mappers.getMapper(ApplicationMapper.class).portalApplicationToPropertyApplication(portalApplication);
         return createPropertyApplication(propertyApplication);
+    }
+
+    @GetMapping
+    @RequestMapping(value = "/applications/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PropertyApplication> getApplicationById(@PathVariable @Valid long id) {
+        var application = repo.findById(id);
+        // TODO: maybe add error response/error message here, too
+        return application.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
     // This could be refactored into a business layer later if necessary
