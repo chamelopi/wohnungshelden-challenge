@@ -1,6 +1,8 @@
 package searchrequests.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +21,7 @@ import searchrequests.persistence.PropertyApplicationRepository;
 import javax.validation.Valid;
 import java.time.Instant;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class PropertyApplicationController {
@@ -32,20 +35,25 @@ public class PropertyApplicationController {
     @RequestMapping(value = "/ui/applications/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PropertyApplication> createApplicationFromUi(@RequestBody @Valid UiApplicationDto uiApplication) {
         var propertyApplication = Mappers.getMapper(ApplicationMapper.class).uiApplicationToPropertyApplication(uiApplication);
-        return persistPropertyApplication(propertyApplication);
+        return createPropertyApplication(propertyApplication);
     }
 
     @PostMapping
     @RequestMapping(value = "/portal/applications/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PropertyApplication> createApplicationFromPortal(@RequestBody @Valid PortalApplicationDto portalApplication) {
         var propertyApplication = Mappers.getMapper(ApplicationMapper.class).portalApplicationToPropertyApplication(portalApplication);
-        return persistPropertyApplication(propertyApplication);
+        return createPropertyApplication(propertyApplication);
     }
 
-    ResponseEntity<PropertyApplication> persistPropertyApplication(PropertyApplication propertyApplication) {
+    // This could be refactored into a business layer later if necessary
+    private ResponseEntity<PropertyApplication> createPropertyApplication(PropertyApplication propertyApplication) {
         propertyApplication.setStatus(Status.CREATED);
         propertyApplication.setCreationTimestamp(Instant.now());
         propertyApplication = repo.save(propertyApplication);
+
+        // We should use the MDC if we wanted log these IDs in more places, but this is ok for now
+        log.info("PropertyApplication created with propertyId={}, applicationId={} and source={}",
+                propertyApplication.getPropertyId(), propertyApplication.getId(), propertyApplication.getCreationSource().name());
 
         // Build a URL to the newly created resource
         var url = ServletUriComponentsBuilder.fromCurrentServletMapping()
