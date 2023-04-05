@@ -4,9 +4,14 @@ import org.springframework.data.jpa.domain.Specification;
 import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
 
+import java.util.Set;
+
 public class FilterSpecifications {
 
-    private FilterSpecifications() {}
+    private FilterSpecifications() {
+    }
+
+    public static final Set<String> AVAILABLE_FIELDS = Set.of("propertyId", "email", "numberOfPersons", "wbsPresent", "status");
 
     public static Specification<PropertyApplication> hasPropertyId(long propertyId) {
         return (application, ignored, cb) -> cb.equal(application.get("propertyId"), propertyId);
