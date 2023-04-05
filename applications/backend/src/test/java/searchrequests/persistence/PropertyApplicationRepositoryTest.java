@@ -17,7 +17,7 @@ import static searchrequests.persistence.FilterSpecifications.*;
 class PropertyApplicationRepositoryTest {
 
     @Autowired
-    PropertyApplicationRepository repo;
+    private PropertyApplicationRepository repo;
 
     @BeforeEach
     void setUp() {

@@ -11,6 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
+import searchrequests.business.PropertyApplicationService;
 import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
@@ -29,10 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class PropertyApplicationControllerTest {
 
     @Autowired
-    MockMvc mvc;
+    private MockMvc mvc;
+
+    // Need this for controller to load
+    @MockBean
+    private PropertyApplicationService service;
 
     @MockBean
-    PropertyApplicationRepository repo;
+    private PropertyApplicationRepository repo;
 
     @Test
     @DisplayName("test creation of applications from UI")
