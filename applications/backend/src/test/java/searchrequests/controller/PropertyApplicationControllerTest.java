@@ -1,6 +1,5 @@
 package searchrequests.controller;
 
-import org.hibernate.annotations.ManyToAny;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,12 +11,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.ResourceUtils;
 import searchrequests.persistence.PropertyApplicationRepository;
 
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.nio.file.Files;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,12 +36,13 @@ class PropertyApplicationControllerTest {
         doAnswer(inv -> inv.getArgument(0)).when(repo).save(any());
 
         mvc.perform(post("/api/v1/ui/applications/")
-                .content(testdata)
-                .contentType(MediaType.APPLICATION_JSON))
+                        .content(testdata)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.status").value("CREATED"))
+                .andExpect(jsonPath("$.creationTimestamp").isNotEmpty())
                 .andExpect(jsonPath("$.creationSource").value("MANUAL"));
 
         Mockito.verify(repo, times(1)).save(any());
@@ -63,7 +62,9 @@ class PropertyApplicationControllerTest {
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(header().exists("Location"))
                 .andExpect(jsonPath("$.status").value("CREATED"))
-                .andExpect(jsonPath("$.creationSource").value("PORTAL"));
+                .andExpect(jsonPath("$.creationSource").value("PORTAL"))
+                .andExpect(jsonPath("$.creationTimestamp").isNotEmpty())
+                .andExpect(jsonPath("$.earliestMoveInDate").value("2023-06-01"));
 
         Mockito.verify(repo, times(1)).save(any());
     }

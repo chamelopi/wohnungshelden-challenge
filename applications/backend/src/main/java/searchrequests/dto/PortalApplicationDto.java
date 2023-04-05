@@ -1,14 +1,12 @@
 package searchrequests.dto;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.fasterxml.jackson.datatype.jsr310.ser.ZonedDateTimeSerializer;
 import lombok.Data;
 import searchrequests.model.Salutation;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 
 @Data
 public class PortalApplicationDto {
@@ -28,8 +26,7 @@ public class PortalApplicationDto {
 
     private boolean wbsPresent;
 
-    @JsonSerialize(using = ZonedDateTimeSerializer.class)
-    private ZonedDateTime earliestMoveInDate;
+    private LocalDate earliestMoveInDate;
 
     private boolean pets;
 

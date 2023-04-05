@@ -3,7 +3,8 @@ package searchrequests.model;
 import lombok.Data;
 
 import javax.persistence.*;
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 
 // Named "PropertyApplication" instead of "Application" to reduce confusion
 @Entity(name = "application")
@@ -36,9 +37,9 @@ public class PropertyApplication {
     @Column
     private boolean wbsPresent;
 
-    // TODO: zonedDateTime/timezone in general might not make much sense here --> LocalDate!
+    // Time or time zone make no sense here -> LocalDate
     @Column
-    private ZonedDateTime earliestMoveInDate;
+    private LocalDate earliestMoveInDate;
 
     @Column
     private boolean pets;
@@ -52,9 +53,9 @@ public class PropertyApplication {
     @Column
     private String userComment;
 
-    // TODO: This is a technical timestamp --> Instant!
+    // Technical timestamp -> Instant
     @Column
-    private ZonedDateTime creationTimestamp;
+    private Instant creationTimestamp;
 
     @Column
     private CreationSource creationSource;

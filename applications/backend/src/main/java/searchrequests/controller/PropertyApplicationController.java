@@ -17,6 +17,7 @@ import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
 import javax.validation.Valid;
+import java.time.Instant;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -43,6 +44,7 @@ public class PropertyApplicationController {
 
     ResponseEntity<PropertyApplication> persistPropertyApplication(PropertyApplication propertyApplication) {
         propertyApplication.setStatus(Status.CREATED);
+        propertyApplication.setCreationTimestamp(Instant.now());
         propertyApplication = repo.save(propertyApplication);
 
         // Build a URL to the newly created resource
