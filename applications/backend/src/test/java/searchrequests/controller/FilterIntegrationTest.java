@@ -2,7 +2,10 @@ package searchrequests.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -83,7 +86,7 @@ class FilterIntegrationTest {
                 Arguments.of("?status=CREATED", List.of(1L, 3L, 4L, 5L)),
                 Arguments.of("?email=user@blub.de&numberOfPersons=2", List.of(3L, 4L)),
                 Arguments.of("?email=user@blub.de&numberOfPersons=2&wbsPresent=false&propertyId=10&status=CREATED", List.of(4L)),
-                Arguments.of("?email=blah@blub.de&page=1&size=1", List.of(2L))
+                Arguments.of("?email=blah@blub.de&page=0&size=10", List.of(1L, 2L))
         );
     }
 

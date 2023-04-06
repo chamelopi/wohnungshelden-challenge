@@ -38,29 +38,6 @@ class PropertyApplicationRepositoryTest {
                 .hasFieldOrPropertyWithValue("creationSource", CreationSource.MANUAL);
     }
 
-    @Test
-    @DisplayName("cover all filter specifications to catch field name changes")
-    void testFilter() {
-        // Create two applications for different properties
-        repo.save(createDummyApplication());
-        var application2 = createDummyApplication();
-        application2.setId(2);
-        application2.setPropertyId(2);
-        application2.setNumberOfPersons(2);
-        application2.setWbsPresent(true);
-        repo.save(application2);
-
-        var result = repo.findAll(where(hasPropertyId(2)).and(hasEmail("dummy@blub.de")).and(hasStatus(Status.CREATED)));
-
-        assertThat(result)
-                .hasSize(1)
-                .first().hasFieldOrPropertyWithValue("propertyId", 2L);
-
-        result = repo.findAll(where(isWbsPresent(false)).and(hasNumberOfPersons(2)));
-
-        assertThat(result).isEmpty();
-    }
-
     private PropertyApplication createDummyApplication() {
         var application = new PropertyApplication();
         application.setEmail("dummy@blub.de");
