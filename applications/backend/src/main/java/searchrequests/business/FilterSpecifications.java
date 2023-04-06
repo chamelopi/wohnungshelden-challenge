@@ -1,4 +1,4 @@
-package searchrequests.persistence;
+package searchrequests.business;
 
 import org.springframework.data.jpa.domain.Specification;
 import searchrequests.model.PropertyApplication;

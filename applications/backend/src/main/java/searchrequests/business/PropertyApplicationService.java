@@ -1,11 +1,11 @@
 package searchrequests.business;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
-import searchrequests.persistence.FilterSpecifications;
 import searchrequests.persistence.PropertyApplicationRepository;
 
 import java.util.ArrayList;
@@ -17,9 +17,9 @@ public class PropertyApplicationService {
     @Autowired
     private PropertyApplicationRepository repo;
 
-    public Iterable<PropertyApplication> filterApplications(Map<String, String> filterParameters) {
+    public Iterable<PropertyApplication> filterApplications(Map<String, String> filterParameters, Pageable pageable) {
         if (filterParameters.isEmpty()) {
-            return repo.findAll();
+            return repo.findAll(null, pageable);
         }
 
         // Validate filter parameters - not all fields can be filtered
@@ -49,6 +49,6 @@ public class PropertyApplicationService {
         for (int i = 1; i < specs.size(); i++) {
             query = query.and(specs.get(i));
         }
-        return repo.findAll(query);
+        return repo.findAll(query, pageable);
     }
 }

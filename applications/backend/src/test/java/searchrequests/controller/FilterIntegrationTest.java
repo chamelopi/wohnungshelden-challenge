@@ -1,21 +1,31 @@
 package searchrequests.controller;
 
-import org.junit.jupiter.api.BeforeEach;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import searchrequests.model.CreationSource;
 import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+// To prevent conflicts with other tests in the future
+@DirtiesContext
+// To allow @BeforeAll method to be non-static
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class FilterIntegrationTest {
 
@@ -25,7 +35,9 @@ class FilterIntegrationTest {
     @Autowired
     private PropertyApplicationRepository repo;
 
-    @BeforeEach
+    private final ObjectMapper mapper = new ObjectMapper();
+
+    @BeforeAll
     void setUp() {
         repo.deleteAll();
         repo.save(createDummyApplication(1, "blah@blub.de", "blah", 0, false, 12, Status.CREATED, CreationSource.MANUAL));
@@ -39,26 +51,39 @@ class FilterIntegrationTest {
 
     @ParameterizedTest
     @MethodSource("getFilterParameters")
-    void testFilter(String queryParameters, List<Long> expectedIds) {
-        client.get().uri("/api/v1/applications/" + queryParameters).exchange()
+    @DisplayName("test combinations of filter parameters")
+    void testFilter(String queryParameters, List<Long> expectedIds) throws IOException {
+        var result = client.get().uri("/api/v1/applications/" + queryParameters).exchange()
                 .expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON_VALUE)
                 .expectBody()
-                .jsonPath("$").isArray();
+                .jsonPath("$").isArray()
+                .returnResult();
 
-        // TODO: assert IDs
+        var applications = mapper.readValue(result.getResponseBody(), new TypeReference<List<PropertyApplication>>() {});
+
+        assertThat(applications).extracting(PropertyApplication::getId).isEqualTo(expectedIds);
     }
+
+    @Test
+    @DisplayName("test that an invalid filter parameter results in 400 Bad Request")
+    void testInvalidFilter() {
+        client.get().uri("/api/v1/applications/?invalid=filter&email=a@b.de").exchange()
+                .expectStatus().isBadRequest();
+    }
+
 
     private static Stream<Arguments> getFilterParameters() {
         return Stream.of(
-                Arguments.of("", List.of(1, 2, 3, 4, 5, 6, 7)),
-                Arguments.of("?email=blah@blub.de", List.of(1, 2)),
-                Arguments.of("?propertyId=12", List.of(1, 3)),
-                Arguments.of("?wbsPresent=true", List.of(3, 6)),
-                Arguments.of("?numberOfPersons=3", List.of(5)),
-                Arguments.of("?status=CREATED", List.of(1, 3, 4, 5)),
-                Arguments.of("?email=user@blub.de&numberOfPersons=2", List.of(3, 4)),
-                Arguments.of("?email=user@blub.de&numberOfPersons=2&wbsPresent=false&propertyId=10&status=CREATED", List.of(4))
+                Arguments.of("", List.of(1L, 2L, 3L, 4L, 5L, 6L, 7L)),
+                Arguments.of("?email=blah@blub.de", List.of(1L, 2L)),
+                Arguments.of("?propertyId=12", List.of(1L, 3L)),
+                Arguments.of("?wbsPresent=true", List.of(3L, 6L)),
+                Arguments.of("?numberOfPersons=3", List.of(5L)),
+                Arguments.of("?status=CREATED", List.of(1L, 3L, 4L, 5L)),
+                Arguments.of("?email=user@blub.de&numberOfPersons=2", List.of(3L, 4L)),
+                Arguments.of("?email=user@blub.de&numberOfPersons=2&wbsPresent=false&propertyId=10&status=CREATED", List.of(4L)),
+                Arguments.of("?email=blah@blub.de&page=1&size=1", List.of(2L))
         );
     }
 

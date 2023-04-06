@@ -3,7 +3,7 @@ package searchrequests.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,12 +14,10 @@ import searchrequests.dto.UiApplicationDto;
 import searchrequests.dto.mapper.ApplicationMapper;
 import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
-import searchrequests.persistence.FilterSpecifications;
 import searchrequests.persistence.PropertyApplicationRepository;
 
 import javax.validation.Valid;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Map;
 
 @Slf4j
@@ -57,11 +55,11 @@ public class PropertyApplicationController {
         return application.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    // TODO: API might not be optimal - could conflict with paging later
     @GetMapping
     @RequestMapping(value = "/applications/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Iterable<PropertyApplication>> filterApplications(@RequestParam Map<String, String> filterParameters) {
-        return ResponseEntity.ok(service.filterApplications(filterParameters));
+    public ResponseEntity<Iterable<PropertyApplication>> filterApplications(@RequestParam Map<String, String> filterParameters,
+                                                                            Pageable pageable) {
+        return ResponseEntity.ok(service.filterApplications(filterParameters, pageable));
     }
 
     // This could be refactored into a business layer later if necessary
