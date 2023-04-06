@@ -10,8 +10,6 @@ import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.data.jpa.domain.Specification.where;
-import static searchrequests.business.FilterSpecifications.*;
 
 @DataJpaTest
 class PropertyApplicationRepositoryTest {

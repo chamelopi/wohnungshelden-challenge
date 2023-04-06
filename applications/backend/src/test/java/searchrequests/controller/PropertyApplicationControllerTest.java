@@ -97,13 +97,7 @@ class PropertyApplicationControllerTest {
     @Test
     @DisplayName("test if retrieval by id works")
     void testGetById() throws Exception {
-        var testApplication = new PropertyApplication();
-        testApplication.setId(12);
-        testApplication.setStatus(Status.CREATED);
-        testApplication.setCreationTimestamp(Instant.now());
-        testApplication.setFirstName("blub");
-        testApplication.setEmail("blub@blah.de");
-        testApplication.setPropertyId(1337);
+        var testApplication = createDummyApplication();
 
         doReturn(Optional.of(testApplication)).when(repo).findById(12L);
 
@@ -121,4 +115,17 @@ class PropertyApplicationControllerTest {
         mvc.perform(get("/api/v1/applications/12"))
                 .andExpect(status().isNotFound());
     }
+
+    private PropertyApplication createDummyApplication() {
+        var testApplication = new PropertyApplication();
+        testApplication.setId(12);
+        testApplication.setStatus(Status.CREATED);
+        testApplication.setCreationTimestamp(Instant.now());
+        testApplication.setFirstName("blub");
+        testApplication.setEmail("blub@blah.de");
+        testApplication.setPropertyId(1337);
+        return testApplication;
+    }
+
+
 }

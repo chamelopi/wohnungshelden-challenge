@@ -33,7 +33,7 @@
   - When an application is created the status is set to CREATED.
   - Both creation use cases need to set the PropertyId (this is an additional input
     parameter for both the manual and portal cases).
-- [ ] Enable backend to filter created applications for displaying in the UI without pagination
+- [x] Enable backend to filter created applications for displaying in the UI without pagination
   - The result must be sorted by “newest first based on creation timestamp”
   - Filter parameters (all except the PropertyId are optional from the UI, meaning that
     there must also be a way to display all applications for a Property)
@@ -56,7 +56,7 @@
 
 # Nice to have requirements (bonus)
 
-- [ ] The filter feature should support pagination with a page size and page number which is
+- [x] The filter feature should support pagination with a page size and page number which is
   given from the UI
 - [ ] Add more validations to “automatically create applications from portals”
   - EarliestMoveInDate must be in the future, if set

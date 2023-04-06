@@ -4,6 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.mapstruct.factory.Mappers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.SortDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -59,7 +62,9 @@ public class PropertyApplicationController {
     @GetMapping
     @RequestMapping(value = "/applications/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Iterable<PropertyApplication>> filterApplications(@RequestParam Map<String, String> filterParameters,
-                                                                            Pageable pageable) {
+                                                                            @PageableDefault(size = 100)
+                                                                            // Sort by newest applications first by default
+                                                                            @SortDefault(sort = "creationTimestamp", direction = Sort.Direction.DESC) Pageable pageable) {
         var page = service.filterApplications(filterParameters, pageable);
         return ResponseEntity.status(HttpStatus.OK)
                 // For frontend to calculate the total number of pages
