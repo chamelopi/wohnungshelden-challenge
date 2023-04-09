@@ -136,6 +136,32 @@ class PropertyApplicationControllerTest {
                 .andExpect(header().string("Location", "http://localhost/api/v1/applications/12"));
     }
 
+    @Test
+    @DisplayName("test if updating user comment works")
+    void testUpdateComment() throws Exception {
+        var testApplication = createDummyApplication();
+
+        doReturn(Optional.of(testApplication)).when(repo).findById(12L);
+        doReturn(testApplication).when(repo).save(testApplication);
+
+        mvc.perform(put("/api/v1/applications/12/userComment/")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content("My user comment"))
+                .andExpect(status().isNoContent())
+                .andExpect(header().string("Location", "http://localhost/api/v1/applications/12"));
+    }
+
+    @Test
+    @DisplayName("test if length constraint for user comment update works")
+    void testUpdateCommentTooLong() throws Exception {
+        var longComment = "A".repeat(1001);
+
+        mvc.perform(put("/api/v1/applications/12/userComment/")
+                        .contentType(MediaType.TEXT_PLAIN)
+                        .content(longComment))
+                .andExpect(status().isBadRequest());
+    }
+
     private PropertyApplication createDummyApplication() {
         var testApplication = new PropertyApplication();
         testApplication.setId(12);

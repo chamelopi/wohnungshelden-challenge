@@ -21,6 +21,7 @@ import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Size;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
@@ -63,6 +64,22 @@ public class PropertyApplicationController {
         repo.save(application);
 
         log.info("Set status of application with id={} to {}", id, status);
+
+        return ResponseEntity.noContent()
+                .header("Location", buildPropertyApplicationUri(id).toString())
+                .build();
+    }
+
+    // TODO: Do we want to merge PUTs into a single endpoint? Or a PATCH endpoint?
+    // FIXME: Validation does not work
+    @PutMapping(value = "/applications/{id}/userComment/", consumes = MediaType.TEXT_PLAIN_VALUE)
+    public ResponseEntity<Void> updateUserComment(@PathVariable long id, @RequestBody @Valid @Size(max = 1000) String userComment) {
+        var application = repo.findById(id).orElseThrow();
+        application.setUserComment(userComment);
+        repo.save(application);
+
+        // Not logging user comment for the sake of data protection
+        log.info("Set userComment of application with id={}", id);
 
         return ResponseEntity.noContent()
                 .header("Location", buildPropertyApplicationUri(id).toString())
