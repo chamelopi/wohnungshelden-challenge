@@ -21,6 +21,7 @@ import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
 import javax.validation.Valid;
+import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
 import java.util.NoSuchElementException;
@@ -36,26 +37,36 @@ public class PropertyApplicationController {
     @Autowired
     private PropertyApplicationService service;
 
-    @PostMapping
-    @RequestMapping(value = "/ui/applications/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/ui/applications/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PropertyApplication> createApplicationFromUi(@RequestBody @Valid UiApplicationDto uiApplication) {
         var propertyApplication = Mappers.getMapper(ApplicationMapper.class).uiApplicationToPropertyApplication(uiApplication);
         return createPropertyApplication(propertyApplication);
     }
 
-    @PostMapping
-    @RequestMapping(value = "/portal/applications/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/portal/applications/", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PropertyApplication> createApplicationFromPortal(@RequestBody @Valid PortalApplicationDto portalApplication) {
         var propertyApplication = Mappers.getMapper(ApplicationMapper.class).portalApplicationToPropertyApplication(portalApplication);
         return createPropertyApplication(propertyApplication);
     }
 
-    @GetMapping
-    @RequestMapping(value = "/applications/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<PropertyApplication> getApplicationById(@PathVariable @Valid long id) {
+    @GetMapping(value = "/applications/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<PropertyApplication> getApplicationById(@PathVariable long id) {
         var application = repo.findById(id);
         return application.map(ResponseEntity::ok)
                 .orElseThrow(() -> new NoSuchElementException("No property application with id " + id + " exists!"));
+    }
+
+    @PutMapping(value = "/applications/{id}/status/{status}")
+    public ResponseEntity<Void> updateStatus(@PathVariable long id, @PathVariable Status status) {
+        var application = repo.findById(id).orElseThrow();
+        application.setStatus(status);
+        repo.save(application);
+
+        log.info("Set status of application with id={} to {}", id, status);
+
+        return ResponseEntity.noContent()
+                .header("Location", buildPropertyApplicationUri(id).toString())
+                .build();
     }
 
     @GetMapping
@@ -84,11 +95,15 @@ public class PropertyApplicationController {
                 propertyApplication.getPropertyId(), propertyApplication.getId(), propertyApplication.getCreationSource().name());
 
         // Build a URL to the newly created resource
-        var url = ServletUriComponentsBuilder.fromCurrentServletMapping()
-                .path("api/v1/applications/{id}")
-                .buildAndExpand(propertyApplication.getId())
-                .toUri();
+        var url = buildPropertyApplicationUri(propertyApplication.getId());
 
         return ResponseEntity.created(url).body(propertyApplication);
+    }
+
+    private URI buildPropertyApplicationUri(long id) {
+        return ServletUriComponentsBuilder.fromCurrentServletMapping()
+                .path("api/v1/applications/{id}")
+                .buildAndExpand(id)
+                .toUri();
     }
 }

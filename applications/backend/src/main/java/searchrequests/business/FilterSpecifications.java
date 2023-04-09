@@ -22,6 +22,8 @@ public class FilterSpecifications {
      * For each field that can be filtered, provides a conversion function from String to its respective type.
      * <p><p>
      * To add a filter parameter, simply extend this map.
+     * <p><p>
+     * Note that this approach to filtering is limited to checks for equality.
      */
     private static final Map<String, Function<String, Object>> FIELD_CONVERTERS = Map.of(
             "propertyId", Long::valueOf,

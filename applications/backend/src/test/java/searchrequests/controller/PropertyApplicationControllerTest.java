@@ -20,10 +20,10 @@ import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Optional;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = {PropertyApplicationController.class})
@@ -114,6 +114,25 @@ class PropertyApplicationControllerTest {
 
         mvc.perform(get("/api/v1/applications/12"))
                 .andExpect(status().isNotFound());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"DECLINED", "INVITED"})
+    @DisplayName("test if status update works")
+    void testUpdateStatus(String status) throws Exception {
+        var testApplication = createDummyApplication();
+
+        doReturn(Optional.of(testApplication)).when(repo).findById(12L);
+        doAnswer(inv -> {
+            var application = inv.getArgument(0, PropertyApplication.class);
+            assertThat(application.getStatus()).isEqualTo(Status.valueOf(status));
+
+            return application;
+        }).when(repo).save(testApplication);
+
+        mvc.perform(put("/api/v1/applications/12/status/" + status))
+                .andExpect(status().isNoContent())
+                .andExpect(header().string("Location", "http://localhost/api/v1/applications/12"));
     }
 
     private PropertyApplication createDummyApplication() {

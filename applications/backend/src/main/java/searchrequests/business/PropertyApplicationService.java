@@ -15,6 +15,9 @@ public class PropertyApplicationService {
     @Autowired
     private PropertyApplicationRepository repo;
 
+    /**
+     * Transforms a map of query strings to filter Specifications and feeds them to the {@link PropertyApplicationRepository}
+     */
     public Page<PropertyApplication> filterApplications(Map<String, String> filterParameters, Pageable pageable) {
         if (filterParameters.isEmpty()) {
             // null -> no filter

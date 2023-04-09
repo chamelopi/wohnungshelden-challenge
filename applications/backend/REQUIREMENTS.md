@@ -61,9 +61,9 @@
 - [ ] Add more validations to “automatically create applications from portals”
   - EarliestMoveInDate must be in the future, if set
   - ApplicantComment must not be longer than 1000 characters
-- [ ] Enable backend to change the status of multiple applications to INVITED (invite use
+- [x] Enable backend to change the status of multiple applications to INVITED (invite use
   case)
-- [ ] Enable backend to change the status of multiple applications to DECLINED (decline use
+- [x] Enable backend to change the status of multiple applications to DECLINED (decline use
   case)
 - [ ] Set/Update the UserComment via separate endpoint
   - Add validation that input must not be longer than 1000 characters
