@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-// TODO: Maybe unit test these in addition to the integration test in FilterIntegrationTest
 /**
  * Creates {@link Specification}s for filtering the PropertyApplication repository.
  * <p><p>

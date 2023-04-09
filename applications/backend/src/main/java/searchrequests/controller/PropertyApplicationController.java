@@ -71,7 +71,9 @@ public class PropertyApplicationController {
                 .body(page.toList());
     }
 
-    // Stays here because it deals with URL/ResponseEntity creation and does not contain any actual business logic
+    // Stays here because it deals with URL/ResponseEntity creation.
+    // We *could* move setting the status & creation date into another method in the PropertyApplicationService since
+    // that technically is business logic, but that would not really help in terms of readability.
     private ResponseEntity<PropertyApplication> createPropertyApplication(PropertyApplication propertyApplication) {
         propertyApplication.setStatus(Status.CREATED);
         propertyApplication.setCreationTimestamp(Instant.now());
