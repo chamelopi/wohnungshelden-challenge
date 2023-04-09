@@ -81,7 +81,8 @@ class PropertyApplicationControllerTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"uiapplication_invalid_email.json", "uiapplication_missing_first_name.json", "portalapplication_missing_property_id.json"})
+    @ValueSource(strings = {"uiapplication_invalid_email.json", "uiapplication_missing_first_name.json", "portalapplication_missing_property_id.json",
+            "portalapplication_movein_past.json", "portalapplication_applicantcomment_toolong.json"})
     @DisplayName("test if validation failure causes error responses and no persistence")
     void testValidation(String testdataFile) throws Exception {
         var testdata = Files.readAllBytes(ResourceUtils.getFile("classpath:testdata/" + testdataFile).toPath());

@@ -3,9 +3,7 @@ package searchrequests.dto;
 import lombok.Data;
 import searchrequests.model.Salutation;
 
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
@@ -26,10 +24,12 @@ public class PortalApplicationDto {
 
     private boolean wbsPresent;
 
+    @Future
     private LocalDate earliestMoveInDate;
 
     private boolean pets;
 
+    @Size(max = 1000)
     private String applicantComment;
 
     @NotNull

@@ -58,7 +58,7 @@
 
 - [x] The filter feature should support pagination with a page size and page number which is
   given from the UI
-- [ ] Add more validations to “automatically create applications from portals”
+- [x] Add more validations to “automatically create applications from portals”
   - EarliestMoveInDate must be in the future, if set
   - ApplicantComment must not be longer than 1000 characters
 - [x] Enable backend to change the status of multiple applications to INVITED (invite use
