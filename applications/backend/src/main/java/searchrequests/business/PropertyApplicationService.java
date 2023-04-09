@@ -3,13 +3,10 @@ package searchrequests.business;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import searchrequests.model.PropertyApplication;
-import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
-import java.util.ArrayList;
 import java.util.Map;
 
 @Service

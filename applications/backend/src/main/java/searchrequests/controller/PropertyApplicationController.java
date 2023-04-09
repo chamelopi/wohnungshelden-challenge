@@ -23,13 +23,12 @@ import searchrequests.persistence.PropertyApplicationRepository;
 import javax.validation.Valid;
 import java.time.Instant;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1")
 public class PropertyApplicationController {
-
-    // TODO/Nice to have: ControllerAdvice to return nice error messages for frontend
 
     @Autowired
     private PropertyApplicationRepository repo;
@@ -55,8 +54,8 @@ public class PropertyApplicationController {
     @RequestMapping(value = "/applications/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PropertyApplication> getApplicationById(@PathVariable @Valid long id) {
         var application = repo.findById(id);
-        // TODO: maybe add error response/error message here, too
-        return application.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
+        return application.map(ResponseEntity::ok)
+                .orElseThrow(() -> new NoSuchElementException("No property application with id " + id + " exists!"));
     }
 
     @GetMapping
@@ -72,7 +71,7 @@ public class PropertyApplicationController {
                 .body(page.toList());
     }
 
-    // This could be refactored into a business layer later if necessary
+    // Stays here because it deals with URL/ResponseEntity creation and does not contain any actual business logic
     private ResponseEntity<PropertyApplication> createPropertyApplication(PropertyApplication propertyApplication) {
         propertyApplication.setStatus(Status.CREATED);
         propertyApplication.setCreationTimestamp(Instant.now());
