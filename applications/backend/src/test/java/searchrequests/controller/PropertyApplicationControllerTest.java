@@ -16,6 +16,7 @@ import searchrequests.model.PropertyApplication;
 import searchrequests.model.Status;
 import searchrequests.persistence.PropertyApplicationRepository;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Instant;
 import java.util.Optional;
@@ -42,7 +43,7 @@ class PropertyApplicationControllerTest {
     @Test
     @DisplayName("test creation of applications from UI")
     void testCreateFromUi() throws Exception {
-        var testdata = Files.readAllBytes(ResourceUtils.getFile("classpath:testdata/uiapplication.json").toPath());
+        var testdata = loadTestdataFile("uiapplication.json");
 
         doAnswer(inv -> inv.getArgument(0)).when(repo).save(any());
 
@@ -62,7 +63,7 @@ class PropertyApplicationControllerTest {
     @Test
     @DisplayName("test creation of applications from an external portal application")
     void testCreateFromPortal() throws Exception {
-        var testdata = Files.readAllBytes(ResourceUtils.getFile("classpath:testdata/portalapplication.json").toPath());
+        var testdata = loadTestdataFile("portalapplication.json");
 
         doAnswer(inv -> inv.getArgument(0)).when(repo).save(any());
 
@@ -85,7 +86,7 @@ class PropertyApplicationControllerTest {
             "portalapplication_movein_past.json", "portalapplication_applicantcomment_toolong.json"})
     @DisplayName("test if validation failure causes error responses and no persistence")
     void testValidation(String testdataFile) throws Exception {
-        var testdata = Files.readAllBytes(ResourceUtils.getFile("classpath:testdata/" + testdataFile).toPath());
+        var testdata = loadTestdataFile(testdataFile);
 
         mvc.perform(post("/api/v1/ui/applications/")
                         .content(testdata)
@@ -131,7 +132,9 @@ class PropertyApplicationControllerTest {
             return application;
         }).when(repo).save(testApplication);
 
-        mvc.perform(put("/api/v1/applications/12/status/" + status))
+        mvc.perform(put("/api/v1/applications/12")
+                        .content("{\"status\": \"" + status + "\"}")
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent())
                 .andExpect(header().string("Location", "http://localhost/api/v1/applications/12"));
     }
@@ -139,14 +142,15 @@ class PropertyApplicationControllerTest {
     @Test
     @DisplayName("test if updating user comment works")
     void testUpdateComment() throws Exception {
+        var data = loadTestdataFile("update_usercomment.json");
         var testApplication = createDummyApplication();
 
         doReturn(Optional.of(testApplication)).when(repo).findById(12L);
         doReturn(testApplication).when(repo).save(testApplication);
 
-        mvc.perform(put("/api/v1/applications/12/userComment/")
-                        .contentType(MediaType.TEXT_PLAIN)
-                        .content("My user comment"))
+        mvc.perform(put("/api/v1/applications/12")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(data))
                 .andExpect(status().isNoContent())
                 .andExpect(header().string("Location", "http://localhost/api/v1/applications/12"));
     }
@@ -154,12 +158,19 @@ class PropertyApplicationControllerTest {
     @Test
     @DisplayName("test if length constraint for user comment update works")
     void testUpdateCommentTooLong() throws Exception {
-        var longComment = "A".repeat(1001);
+        var longComment = loadTestdataFile("update_usercomment_toolong.json");
+        var testApplication = createDummyApplication();
 
-        mvc.perform(put("/api/v1/applications/12/userComment/")
-                        .contentType(MediaType.TEXT_PLAIN)
+        doReturn(Optional.of(testApplication)).when(repo).findById(12L);
+
+        mvc.perform(put("/api/v1/applications/12")
+                        .contentType(MediaType.APPLICATION_JSON)
                         .content(longComment))
                 .andExpect(status().isBadRequest());
+    }
+
+    private byte[] loadTestdataFile(String filename) throws IOException {
+        return Files.readAllBytes(ResourceUtils.getFile("classpath:testdata/" + filename).toPath());
     }
 
     private PropertyApplication createDummyApplication() {

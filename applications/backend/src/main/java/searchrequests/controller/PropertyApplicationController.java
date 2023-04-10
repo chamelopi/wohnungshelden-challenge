@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import searchrequests.business.PropertyApplicationService;
 import searchrequests.dto.PortalApplicationDto;
+import searchrequests.dto.PropertyApplicationUpdateDto;
 import searchrequests.dto.UiApplicationDto;
 import searchrequests.dto.mapper.ApplicationMapper;
 import searchrequests.model.PropertyApplication;
@@ -57,29 +58,18 @@ public class PropertyApplicationController {
                 .orElseThrow(() -> new NoSuchElementException("No property application with id " + id + " exists!"));
     }
 
-    @PutMapping(value = "/applications/{id}/status/{status}")
-    public ResponseEntity<Void> updateStatus(@PathVariable long id, @PathVariable Status status) {
+    @PutMapping(value = "/applications/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Void> update(@PathVariable long id, @RequestBody @Valid PropertyApplicationUpdateDto updateDto) {
         var application = repo.findById(id).orElseThrow();
-        application.setStatus(status);
+        if (updateDto.getStatus() != null) {
+            application.setStatus(updateDto.getStatus());
+        }
+        if (updateDto.getUserComment() != null) {
+            application.setUserComment(updateDto.getUserComment());
+        }
         repo.save(application);
 
-        log.info("Set status of application with id={} to {}", id, status);
-
-        return ResponseEntity.noContent()
-                .header("Location", buildPropertyApplicationUri(id).toString())
-                .build();
-    }
-
-    // TODO: Do we want to merge PUTs into a single endpoint? Or a PATCH endpoint?
-    // FIXME: Validation does not work
-    @PutMapping(value = "/applications/{id}/userComment/", consumes = MediaType.TEXT_PLAIN_VALUE)
-    public ResponseEntity<Void> updateUserComment(@PathVariable long id, @RequestBody @Valid @Size(max = 1000) String userComment) {
-        var application = repo.findById(id).orElseThrow();
-        application.setUserComment(userComment);
-        repo.save(application);
-
-        // Not logging user comment for the sake of data protection
-        log.info("Set userComment of application with id={}", id);
+        log.info("Updated application with id={}", id);
 
         return ResponseEntity.noContent()
                 .header("Location", buildPropertyApplicationUri(id).toString())

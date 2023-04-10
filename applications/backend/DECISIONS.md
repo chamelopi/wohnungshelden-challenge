@@ -78,3 +78,16 @@ I decided against the public ID pattern because
 
 In a real-world application however, the pattern could be used to hide database internals and increase readability.
 
+### 2.3 Update DTO
+
+I designed the update endpoint for status updates and userComment updates as a single endpoint, with one common DTO
+containing both fields. This has several advantages:
+- scales well if more fields should be updatable
+- only one REST call from frontend when multiple fields are updated simultaneously
+- can define validations in one central place
+
+There is one drawback with the current solution however:
+- manual null checks are necessary for every single field
+
+There might be a way to merge the non-null fields with the existing PropertyApplication entity, but I didn't explore
+this possibility.
