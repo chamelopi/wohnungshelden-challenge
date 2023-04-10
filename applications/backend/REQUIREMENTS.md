@@ -65,5 +65,5 @@
   case)
 - [x] Enable backend to change the status of multiple applications to DECLINED (decline use
   case)
-- [ ] Set/Update the UserComment via separate endpoint
+- [x] Set/Update the UserComment via separate endpoint
   - Add validation that input must not be longer than 1000 characters
