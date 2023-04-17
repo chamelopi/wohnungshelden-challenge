@@ -52,6 +52,8 @@ repo.findAll(where(hasEmail(queryMap.get("email")))
         pageable);
 ```
 
+This will make the code more verbose, less generic and needs to account for optional filters, too.
+
 ### 1.3 OData queries
 
 [Example](https://www.baeldung.com/olingo)
