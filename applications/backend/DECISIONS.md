@@ -90,7 +90,7 @@ and `propertyId`.
 However, this would make them both harder to read and their differences (especially the optional `firstName`
 in `PortalApplicationDto`) more difficult to spot.
 
-### 2.2 No DTO for filter endpoint
+### 2.2 No DTO for filter endpoint response
 
 I made this decision primarily because I don't use a public ID + private ID pattern here, and therefore a DTO would be
 identical with the entity class.
@@ -102,11 +102,12 @@ I decided against the public ID pattern because
 - readability for humans is not a concern here (e.g. `application-23568923` vs. `12`)
 - it increases complexity
 
-In a real-world application however, the pattern could be used to hide database internals and increase readability.
+In a real-world application however, the pattern could be used to hide database internals and increase readability. This
+would then require a mapping from entity to DTO.
 
-### 2.3 Update DTO
+### 2.3 Update via a DTO
 
-I designed the update endpoint for status updates and userComment updates as a single endpoint, with one common DTO
+I designed the update endpoint for `status` updates and `userComment` updates as a single endpoint, with one common DTO
 containing both fields. This has several advantages:
 
 - scales well if more fields should be updatable
@@ -117,5 +118,5 @@ There is one drawback with the current solution however:
 
 - manual null checks are necessary for every single field
 
-There might be a way to merge the non-null fields with the existing PropertyApplication entity, but I didn't explore
-this possibility.
+There might be a way to generically merge the non-null fields with the existing PropertyApplication entity, but I didn't
+explore this possibility further.
